@@ -23,39 +23,35 @@ list_sale_price = pd.read_csv('Metro_mlp_uc_sfrcondo_sm_month.csv') # List and S
 price_cuts = pd.read_csv('Metro_sales_count_now_uc_sfrcondo_month.csv') # Sales Count and Price Cuts
 
 # Data Transforms
-home_pricesT = dt.home_price_transform(home_prices)
+home_prices = dt.home_price_transform(home_prices)
 
 # Graphs -------------------
 
-fig = px.line(home_pricesT, x=home_pricesT.index, y=home_pricesT['Los Angeles-Long Beach-Anaheim, CA'])
-fig.show()
+
 
 # App ----------------------
 
 app = Dash(__name__)
-
-
 app.layout = html.Div([
-    html.H4('Life expentancy progression of countries per continents'),
-    dcc.Graph(id="graph"),
-    dcc.Checklist(
-        id="checklist",
-        options=["Asia", "Europe", "Africa","Americas","Oceania"],
-        value=["Americas", "Oceania"],
-        inline=True
-    ),
+    html.H4('Home Prices'),
+    dcc.Dropdown(home_prices.columns, 
+                id='city_selection', 
+                multi=True, 
+                placeholder="Select a city",),
+    html.Div(id='pandas-output-container-2'),
+    dcc.Graph(id='home_prices_graph')
 ])
 
 
 @app.callback(
-    Output("graph", "figure"), 
-    Input("checklist", "value"))
-def update_line_chart(continents):
-    df = px.data.gapminder() # replace with your own data source
-    mask = df.continent.isin(continents)
-    fig = px.line(df[mask], 
-        x="year", y="lifeExp", color='country')
+    Output('pandas-output-container-2', 'children', 'figure'),
+    Input('city_selection', 'value')
+)
+def update_graph(value):
+    home_prices # fix the dataframe so that it updates with the selection
+    fig = px.line(home_prices, x=home_prices.index, y=home_prices.columns)
     return fig
 
 
-app.run_server(debug=True)
+if __name__ == '__main__':
+    app.run_server(debug=True)
