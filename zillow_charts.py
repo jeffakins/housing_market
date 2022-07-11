@@ -24,14 +24,14 @@ list_sale_price = pd.read_csv('Metro_mlp_uc_sfrcondo_sm_month.csv') # List and S
 price_cuts = pd.read_csv('Metro_sales_count_now_uc_sfrcondo_month.csv') # Sales Count and Price Cuts
 
 # Data Transforms
-home_prices = dt.home_price_transform(home_prices)
+home_pricesT = dt.home_price_transform(home_prices)
 
 # App ----------------------
 
 app = Dash(__name__)
 app.layout = html.Div([
     html.H4('Home Prices'),
-    dcc.Dropdown(home_prices.columns, 
+    dcc.Dropdown(home_pricesT.columns, 
                 id='city_selection', 
                 multi=True, 
                 placeholder="Select a city",),
@@ -40,11 +40,11 @@ app.layout = html.Div([
 ])
 
 @app.callback(
-    Output('home_prices_graph', 'figure'),
-    Input('city_selection', 'value')
+    Output(component_id='home_prices_graph', component_property='figure'), # Output graph
+    Input(component_id='city_selection', component_property='value') # Input dropdown city selections
 )
-def update_graph(value):
-    home_selection = home_prices[['value']] # New dataframe with only columns from selection
+def update_graph(cities = ['Los Angeles-Long Beach-Anaheim, CA']):
+    home_selection = home_pricesT[cities] # New dataframe with only columns from selection
     fig = px.line(home_selection, x=home_selection.index, y=home_selection.columns) # Graph with new dataframe
     return fig
 
