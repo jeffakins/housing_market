@@ -10,6 +10,7 @@ import plotly.graph_objects as go
 import dash
 from dash import Dash, html, dcc
 import dash_bootstrap_components as dbc
+from dash.dependencies import Input, Output
 from dash_bootstrap_templates import load_figure_template
 
 # Data Imports
@@ -25,10 +26,6 @@ price_cuts = pd.read_csv('Metro_sales_count_now_uc_sfrcondo_month.csv') # Sales 
 # Data Transforms
 home_prices = dt.home_price_transform(home_prices)
 
-# Graphs -------------------
-
-
-
 # App ----------------------
 
 app = Dash(__name__)
@@ -38,18 +35,17 @@ app.layout = html.Div([
                 id='city_selection', 
                 multi=True, 
                 placeholder="Select a city",),
-    html.Div(id='pandas-output-container-2'),
+    html.Div(id='city_output_container'),
     dcc.Graph(id='home_prices_graph')
 ])
 
-
 @app.callback(
-    Output('pandas-output-container-2', 'children', 'figure'),
+    Output('home_prices_graph', 'figure'),
     Input('city_selection', 'value')
 )
 def update_graph(value):
-    home_prices # fix the dataframe so that it updates with the selection
-    fig = px.line(home_prices, x=home_prices.index, y=home_prices.columns)
+    home_selection = home_prices[['value']] # New dataframe with only columns from selection
+    fig = px.line(home_selection, x=home_selection.index, y=home_selection.columns) # Graph with new dataframe
     return fig
 
 
