@@ -2,18 +2,19 @@
 
 # Imports -----------------
 import pandas as pd
-
+ # Plotly
 import plotly.io as pio
 import plotly.express as px
 import plotly.graph_objects as go
-
+ # Dash
 import dash
 from dash import Dash, html, dcc
-import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
+ # Bootstrap
+import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import load_figure_template
 
-# Data Imports
+ # Data Imports
 import data_transform as dt
 
 # Data ---------------------
@@ -27,23 +28,26 @@ price_cuts = pd.read_csv('Metro_sales_count_now_uc_sfrcondo_month.csv') # Sales 
 home_pricesT = dt.home_price_transform(home_prices)
 
 # App ----------------------
-
-app = Dash(__name__)
-app.layout = html.Div([
-    html.H4('Home Prices'),
-    dcc.Dropdown(home_pricesT.columns, 
-                id='city_selection', 
-                multi=True, 
-                placeholder="Select a city",),
-    html.Div(id='city_output_container'),
-    dcc.Graph(id='home_prices_graph')
-])
-
+app = Dash(__name__, external_stylesheets=[dbc.themes.MORPH])
+app.layout = dbc.Container(
+    [
+        html.H2('Home Prices'),
+        dbc.Row(dcc.Dropdown(home_pricesT.columns, 
+                    id='city_selection', 
+                    value= home_pricesT.columns[1:6],
+                    multi=True, 
+                    placeholder="Select a city",)
+        ),
+        html.Div(id='city_output_container'),
+        dbc.Row(dcc.Graph(id='home_prices_graph'))
+    ],
+    fluid=True,
+)
 @app.callback(
     Output(component_id='home_prices_graph', component_property='figure'), # Output graph
     Input(component_id='city_selection', component_property='value') # Input dropdown city selections
 )
-def update_graph(cities = ['Los Angeles-Long Beach-Anaheim, CA']):
+def update_graph(cities):
     home_selection = home_pricesT[cities] # New dataframe with only columns from selection
     fig = px.line(home_selection, x=home_selection.index, y=home_selection.columns) # Graph with new dataframe
     return fig
