@@ -50,6 +50,10 @@ app.layout = dbc.Container(
 def update_graph(cities):
     home_selection = home_pricesT[cities] # New dataframe with only columns from selection
     fig = px.line(home_selection, x=home_selection.index, y=home_selection.columns) # Graph with new dataframe
+    fig.update_layout(title='Zillow Home Value Index',
+                   xaxis_title='Year',
+                   yaxis_title='Home Value',
+                   height=600,)
     return fig
 
 
