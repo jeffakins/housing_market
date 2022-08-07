@@ -1,6 +1,7 @@
 # An app that displays the latest housing data from Zillow
 
 # Imports -----------------
+from turtle import color
 import pandas as pd
  # Plotly
 import plotly.io as pio
@@ -22,7 +23,7 @@ import data_transform as dt
 home_prices = pd.read_csv('Metro_zhvi_uc_sfrcondo_tier_0.33_0.67_sm_sa_month.csv') # Zillow Home Value Index 
 inventory = pd.read_csv('Metro_invt_fs_uc_sfrcondo_week.csv') # Home Inventory 
 list_sale_price = pd.read_csv('Metro_median_sale_price_uc_sfrcondo_week.csv') # List and Sale Prices
-list_to_sale = pd.read_csv('Metro_mean_sale_to_list_uc_sfrcondo_week.csv') # Mean list to dales ratio
+list_to_sale = pd.read_csv('Metro_mean_sale_to_list_uc_sfrcondo_week.csv') # Mean sale to list ratio
 price_cuts = pd.read_csv('Metro_perc_listings_price_cut_uc_sfrcondo_week.csv') # Price Cuts
 percent_below_list = pd.read_csv('Metro_pct_sold_below_list_uc_sfrcondo_week.csv') # Percent of Home Sold below List Price
 rent = pd.read_csv('Metro_ZORI_AllHomesPlusMultifamily_Smoothed.csv') # Rental Prices
@@ -40,6 +41,9 @@ rentT = dt.home_rent_transform(rent)
 app = Dash(__name__, external_stylesheets=[dbc.themes.MORPH])
 app.layout = dbc.Container(
     [
+        html.P(style={'margin': 10}),
+        html.H1('Housing Market Trends', style={'backgroundColor':'white', 'textAlign': 'center'}),
+        #html.Hr(style={'height': 2}),
         html.H2('Home Prices'),
         dbc.Row(dcc.Dropdown(home_pricesT.columns, 
                     id='city_selection', 
@@ -61,6 +65,12 @@ app.layout = dbc.Container(
         dbc.Row(dcc.Graph(id='percent_below_list_graph')), # Percent below list
         html.H2('Rent'),
         dbc.Row(dcc.Graph(id='rent_graph')), # Rental Rates Graph
+        html.H6([
+            "Made possible thanks to Zillow's public data @ ",
+            html.A("https://www.zillow.com/research/data/", href='https://www.zillow.com/research/data/')
+        ]), 
+        
+        
     ],
     fluid=True,
 )
@@ -144,7 +154,7 @@ def update_graph(cities):
     fig = px.line(home_selection, x=home_selection.index, y=home_selection.columns) # Graph with new dataframe
     fig.update_layout(title='Percent of Homes Sold Below the List Price',
                    xaxis_title='Date',
-                   yaxis_title='Percent of Homes Sold below List',
+                   yaxis_title='Percent of Homes Sold below List (%)',
                    height=600,)
     return fig   
 
