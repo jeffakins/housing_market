@@ -28,6 +28,14 @@ price_cuts = pd.read_csv('Metro_perc_listings_price_cut_uc_sfrcondo_week.csv') #
 percent_below_list = pd.read_csv('Metro_pct_sold_below_list_uc_sfrcondo_week.csv') # Percent of Home Sold below List Price
 rent = pd.read_csv('Metro_ZORI_AllHomesPlusMultifamily_Smoothed.csv') # Rental Prices
 
+zhvi_sfh = pd.read_csv('Metro_zhvi_uc_sfr_tier_0.33_0.67_sm_sa_month.csv')
+zhvi_condos = pd.read_csv('Metro_zhvi_uc_condo_tier_0.33_0.67_sm_sa_month.csv')
+zhvi_1bdr = pd.read_csv('Metro_zhvi_bdrmcnt_1_uc_sfrcondo_tier_0.33_0.67_sm_sa_month.csv')
+zhvi_2bdr = pd.read_csv('Metro_zhvi_bdrmcnt_2_uc_sfrcondo_tier_0.33_0.67_sm_sa_month.csv')
+zhvi_3bdr = pd.read_csv('Metro_zhvi_bdrmcnt_3_uc_sfrcondo_tier_0.33_0.67_sm_sa_month.csv')
+zhvi_4bdr = pd.read_csv('Metro_zhvi_bdrmcnt_4_uc_sfrcondo_tier_0.33_0.67_sm_sa_month.csv')
+zhvi_5bdr = pd.read_csv('Metro_zhvi_bdrmcnt_5_uc_sfrcondo_tier_0.33_0.67_sm_sa_month.csv')
+
 # Data Transforms
 home_pricesT = dt.home_price_transform(home_prices)
 inventoryT = dt.home_price_transform(inventory)
@@ -37,13 +45,20 @@ price_cutsT = dt.home_price_transform(price_cuts)
 percent_below_listT = dt.home_price_transform(percent_below_list)
 rentT = dt.home_rent_transform(rent)
 
+zhvi_sfhT = dt.home_price_transform(zhvi_sfh)
+zhvi_condosT = dt.home_price_transform(zhvi_condos)
+zhvi_1bdrT = dt.home_price_transform(zhvi_1bdr)
+zhvi_2bdrT = dt.home_price_transform(zhvi_2bdr)
+zhvi_3bdrT = dt.home_price_transform(zhvi_3bdr)
+zhvi_4bdrT = dt.home_price_transform(zhvi_4bdr)
+zhvi_5bdrT = dt.home_price_transform(zhvi_5bdr)
+
 # App ----------------------
 app = Dash(__name__, external_stylesheets=[dbc.themes.MORPH])
 app.layout = dbc.Container(
     [
         html.P(style={'margin': 10}),
         html.H1('Housing Market Trends', style={'backgroundColor':'white', 'textAlign': 'center'}),
-        #html.Hr(style={'height': 2}),
         html.H2('Home Prices'),
         dbc.Row(dcc.Dropdown(home_pricesT.columns, 
                     id='city_selection', 
