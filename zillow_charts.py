@@ -53,6 +53,15 @@ zhvi_3bdrT = dt.home_price_transform(zhvi_3bdr)
 zhvi_4bdrT = dt.home_price_transform(zhvi_4bdr)
 zhvi_5bdrT = dt.home_price_transform(zhvi_5bdr)
 
+num_beds = {
+    'All Single Family Homes' : 'zhvi_sfhT',
+    'Condos' : 'zhvi_condosT',
+    '1 Bedroom' : 'zhvi_1bdrT',
+    '2 Bedrooms' : 'zhvi_2bdrT',
+    '3 Bedrooms' : 'zhvi_4bdrT',
+    '4 Bedrooms' : 'zhvi_5bdrT' 
+}
+
 # App ----------------------
 app = Dash(__name__, external_stylesheets=[dbc.themes.MORPH])
 app.layout = dbc.Container(
