@@ -20,13 +20,13 @@ import data_transform as dt
 
 # Data ---------------------
 # Data Imports
-home_prices = pd.read_csv('Metro_zhvi_uc_sfrcondo_tier_0.33_0.67_sm_sa_month.csv') # Zillow Home Value Index 
-inventory = pd.read_csv('Metro_invt_fs_uc_sfrcondo_week.csv') # Home Inventory 
-list_sale_price = pd.read_csv('Metro_median_sale_price_uc_sfrcondo_week.csv') # List and Sale Prices
-list_to_sale = pd.read_csv('Metro_mean_sale_to_list_uc_sfrcondo_week.csv') # Mean sale to list ratio
-price_cuts = pd.read_csv('Metro_perc_listings_price_cut_uc_sfrcondo_week.csv') # Price Cuts
-percent_below_list = pd.read_csv('Metro_pct_sold_below_list_uc_sfrcondo_week.csv') # Percent of Home Sold below List Price
-rent = pd.read_csv('Metro_ZORI_AllHomesPlusMultifamily_Smoothed.csv') # Rental Prices
+home_prices = pd.read_csv('Metro_zhvi_uc_sfrcondo_tier_0.33_0.67_sm_sa_month.csv') # Zillow Home Value Index - Smoothed; all homes; seasonally adjusted
+inventory = pd.read_csv('Metro_invt_fs_uc_sfrcondo_sm_week.csv') # For Sale Inventory - Smoothed; all homes; weekly
+list_sale_price = pd.read_csv('Metro_median_sale_price_uc_sfrcondo_sm_month.csv') # Median Sales Price - Smoothed; all homes; monthly
+list_to_sale = pd.read_csv('Metro_mean_sale_to_list_uc_sfrcondo_sm_week.csv') # Mean sale to list ratio - Smoothed; all homes; weekly
+price_cuts = pd.read_csv('Metro_perc_listings_price_cut_uc_sfrcondo_sm_week.csv') # Share of Listings with a Price cut - smoothed; all homes; weekly
+percent_below_list = pd.read_csv('Metro_pct_sold_below_list_uc_sfrcondo_sm_week.csv') # Percent of Home Sold below List Price - smoothed; all homes; weekly
+rent = pd.read_csv('Metro_ZORI_AllHomesPlusMultifamily_Smoothed.csv') # Rental Prices; all homes
 
 zhvi_sfh = pd.read_csv('Metro_zhvi_uc_sfr_tier_0.33_0.67_sm_sa_month.csv')
 zhvi_condos = pd.read_csv('Metro_zhvi_uc_condo_tier_0.33_0.67_sm_sa_month.csv')
@@ -54,12 +54,12 @@ zhvi_4bdrT = dt.home_price_transform(zhvi_4bdr)
 zhvi_5bdrT = dt.home_price_transform(zhvi_5bdr)
 
 num_beds = {
-    'All Single Family Homes' : 'zhvi_sfhT',
-    'Condos' : 'zhvi_condosT',
-    '1 Bedroom' : 'zhvi_1bdrT',
-    '2 Bedrooms' : 'zhvi_2bdrT',
-    '3 Bedrooms' : 'zhvi_4bdrT',
-    '4 Bedrooms' : 'zhvi_5bdrT' 
+    'All Single Family Homes' : zhvi_sfhT,
+    'Condos' : zhvi_condosT,
+    '1 Bedroom' : zhvi_1bdrT,
+    '2 Bedrooms' : zhvi_2bdrT,
+    '3 Bedrooms' : zhvi_4bdrT,
+    '4 Bedrooms' : zhvi_5bdrT 
 }
 
 # App ----------------------
@@ -77,7 +77,7 @@ app.layout = dbc.Container(
         ),
         html.Div(id='city_output_container'),
         dbc.Row(dcc.Graph(id='home_prices_graph')), # Home Value Graph
-        html.H2('Home Prices'),
+        html.H2('Home Prices based on Home Type'),
         dbc.Row(dcc.Dropdown(list(num_beds), 
                     id='bed_selection', 
                     #value= 'All Single Family Homes',
@@ -88,7 +88,7 @@ app.layout = dbc.Container(
         html.H2('Inventory'),
         dbc.Row(dcc.Graph(id='inventory_graph')), # Inventory Graph
         html.H2('Sale Price'),
-        dbc.Row(dcc.Graph(id='list_price_graph')), # List Price Graph
+        dbc.Row(dcc.Graph(id='list_price_graph')), # Sale Price Graph
         html.H2('Sale to List Ratio'),
         dbc.Row(dcc.Graph(id='list_to_sale_graph')), # List to Sale Graph
         html.H2('Price Cut'),
@@ -122,14 +122,15 @@ def update_graph(city_selection):
 
 # Callback for Home Value Estimate based on Bedrooms
 @app.callback(
-    Output(component_id='home_prices_graph', component_property='figure'), # Output graph
-    Input(component_id='bed_selection', component_property='value')
+    Output(component_id='bedroom_prices_graph', component_property='figure'), # Output graph
+    Input(component_id='bed_selection', component_property='value'),
     Input(component_id='city_selection', component_property='value') # Input dropdown city selections
 )
 def update_graph(bed_selection, city_selection):
-    home_selection = bed_selection[city_selection] # New dataframe with only columns from selection
+    home_type = num_beds[bed_selection]
+    home_selection = home_type[city_selection] # New dataframe with only columns from selection
     fig = px.line(home_selection, x=home_selection.index, y=home_selection.columns) # Graph with new dataframe
-    fig.update_layout(title='Zillow Home Value Index - i.e. the typical home value for each region',
+    fig.update_layout(title='Zillow Home Value Index for the Type of Home Selected',
                    xaxis_title='Date',
                    yaxis_title='Home Value ($)',
                    height=600,)
@@ -157,7 +158,7 @@ def update_graph(cities):
 def update_graph(cities):
     home_selection = list_sale_priceT[cities] # New dataframe with only columns from selection
     fig = px.line(home_selection, x=home_selection.index, y=home_selection.columns) # Graph with new dataframe
-    fig.update_layout(title='Median Sale Price (All homes, weekly)',
+    fig.update_layout(title='Median Sale Price (All homes, monthly)',
                    xaxis_title='Date',
                    yaxis_title='Price ($)',
                    height=600,)
