@@ -71,12 +71,20 @@ app.layout = dbc.Container(
         html.H2('Home Prices'),
         dbc.Row(dcc.Dropdown(home_pricesT.columns, 
                     id='city_selection', 
-                    value= home_pricesT.columns[1:6],
+                    value= home_pricesT.columns[1:6], # Initial placeholder
                     multi=True, 
                     placeholder="Select a city",)
         ),
         html.Div(id='city_output_container'),
         dbc.Row(dcc.Graph(id='home_prices_graph')), # Home Value Graph
+        html.H2('Home Prices'),
+        dbc.Row(dcc.Dropdown(list(num_beds), 
+                    id='bed_selection', 
+                    #value= 'All Single Family Homes',
+                    multi=False, 
+                    placeholder="Select the type of Home",)
+        ),
+        dbc.Row(dcc.Graph(id='bedroom_prices_graph')), # Home Value Graph based on number of bedrooms
         html.H2('Inventory'),
         dbc.Row(dcc.Graph(id='inventory_graph')), # Inventory Graph
         html.H2('Sale Price'),
@@ -103,8 +111,23 @@ app.layout = dbc.Container(
     Output(component_id='home_prices_graph', component_property='figure'), # Output graph
     Input(component_id='city_selection', component_property='value') # Input dropdown city selections
 )
-def update_graph(cities):
-    home_selection = home_pricesT[cities] # New dataframe with only columns from selection
+def update_graph(city_selection):
+    home_selection = home_pricesT[city_selection] # New dataframe with only columns from selection
+    fig = px.line(home_selection, x=home_selection.index, y=home_selection.columns) # Graph with new dataframe
+    fig.update_layout(title='Zillow Home Value Index - i.e. the typical home value for each region',
+                   xaxis_title='Date',
+                   yaxis_title='Home Value ($)',
+                   height=600,)
+    return fig
+
+# Callback for Home Value Estimate based on Bedrooms
+@app.callback(
+    Output(component_id='home_prices_graph', component_property='figure'), # Output graph
+    Input(component_id='bed_selection', component_property='value')
+    Input(component_id='city_selection', component_property='value') # Input dropdown city selections
+)
+def update_graph(bed_selection, city_selection):
+    home_selection = bed_selection[city_selection] # New dataframe with only columns from selection
     fig = px.line(home_selection, x=home_selection.index, y=home_selection.columns) # Graph with new dataframe
     fig.update_layout(title='Zillow Home Value Index - i.e. the typical home value for each region',
                    xaxis_title='Date',
