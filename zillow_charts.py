@@ -21,12 +21,12 @@ import data_transform as dt
 # Data ---------------------
 # Data Imports
 home_prices = pd.read_csv('Metro_zhvi_uc_sfrcondo_tier_0.33_0.67_sm_sa_month.csv') # Zillow Home Value Index - Smoothed; all homes; seasonally adjusted
-inventory = pd.read_csv('Metro_invt_fs_uc_sfrcondo_sm_week.csv') # For Sale Inventory - Smoothed; all homes; weekly
-list_sale_price = pd.read_csv('Metro_median_sale_price_uc_sfrcondo_sm_month.csv') # Median Sales Price - Smoothed; all homes; monthly
-list_to_sale = pd.read_csv('Metro_mean_sale_to_list_uc_sfrcondo_sm_week.csv') # Mean sale to list ratio - Smoothed; all homes; weekly
-price_cuts = pd.read_csv('Metro_perc_listings_price_cut_uc_sfrcondo_sm_week.csv') # Share of Listings with a Price cut - smoothed; all homes; weekly
-percent_below_list = pd.read_csv('Metro_pct_sold_below_list_uc_sfrcondo_sm_week.csv') # Percent of Home Sold below List Price - smoothed; all homes; weekly
-rent = pd.read_csv('Metro_ZORI_AllHomesPlusMultifamily_Smoothed.csv') # Rental Prices; all homes
+inventory = pd.read_csv('Metro_invt_fs_uc_sfrcondo_sm_month.csv') # For Sale Inventory - Smoothed; all homes; weekly
+list_sale_price = pd.read_csv('Metro_median_sale_price_uc_sfrcondo_sm_sa_month.csv') # Median Sales Price - Smoothed; all homes; monthly
+mean_days_to_pending = pd.read_csv('Metro_mean_doz_pending_uc_sfrcondo_sm_month.csv') # Mean sale to list ratio - Smoothed; all homes; weekly
+price_cuts = pd.read_csv('Metro_perc_listings_price_cut_uc_sfrcondo_sm_month.csv') # Share of Listings with a Price cut - smoothed; all homes; weekly
+percent_below_list = pd.read_csv('Metro_pct_sold_below_list_uc_sfrcondo_sm_month.csv') # Percent of Home Sold below List Price - smoothed; all homes; weekly
+rent = pd.read_csv('Metro_zori_uc_sfrcondomfr_sm_month.csv') # Rental Prices; all homes
 
 zhvi_sfh = pd.read_csv('Metro_zhvi_uc_sfr_tier_0.33_0.67_sm_sa_month.csv')
 zhvi_condos = pd.read_csv('Metro_zhvi_uc_condo_tier_0.33_0.67_sm_sa_month.csv')
@@ -40,7 +40,7 @@ zhvi_5bdr = pd.read_csv('Metro_zhvi_bdrmcnt_5_uc_sfrcondo_tier_0.33_0.67_sm_sa_m
 home_pricesT = dt.home_price_transform(home_prices)
 inventoryT = dt.home_price_transform(inventory)
 list_sale_priceT = dt.home_price_transform(list_sale_price)
-list_to_saleT = dt.home_price_transform(list_to_sale)
+mean_days_to_pendingT = dt.home_price_transform(mean_days_to_pending)
 price_cutsT = dt.home_price_transform(price_cuts)
 percent_below_listT = dt.home_price_transform(percent_below_list)
 rentT = dt.home_rent_transform(rent)
@@ -70,7 +70,7 @@ app.layout = dbc.Container(
     [
         html.P(style={'margin': 10}),
         html.H1('Housing Market Trends', style={'textAlign': 'center', 'font-weight': 'bold'}),
-        html.H3('Home Prices'),
+        html.H3('Home Prices', className="bg-primary text-light"),
         dbc.Row(dcc.Dropdown(home_pricesT.columns, 
                     id='city_selection', 
                     value= home_pricesT.columns[1:6], # Initial placeholder
@@ -81,35 +81,35 @@ app.layout = dbc.Container(
         ),
         html.Div(id='city_output_container'),
         dbc.Row(dcc.Graph(id='home_prices_graph')), # Home Value Graph
-        html.H3('Home Prices based on Home Type'),
+        html.H3('Home Prices based on Home Type', className="bg-primary text-light"),
         dbc.Row(dcc.Dropdown(list(num_beds), 
                     id='bed_selection', 
-                    #value= 'All Single Family Homes',
+                    value= 'All Single Family Homes',
                     multi=False, 
                     placeholder="Select the type of Home",
+                    className="dbc"
                     )
         ),
         dbc.Row(dcc.Graph(id='bedroom_prices_graph')), # Home Value Graph based on number of bedrooms
-        html.H3('Inventory'),
+        html.H3('Inventory', className="bg-primary text-light"),
         dbc.Row(dcc.Graph(id='inventory_graph')), # Inventory Graph
-        html.H3('Sale Price'),
+        html.H3('Sale Price', className="bg-primary text-light"),
         dbc.Row(dcc.Graph(id='list_price_graph')), # Sale Price Graph
-        html.H3('Sale to List Ratio'),
-        dbc.Row(dcc.Graph(id='list_to_sale_graph')), # List to Sale Graph
-        html.H3('Price Cut'),
+        html.H3('Sale to List Ratio', className="bg-primary text-light"),
+        dbc.Row(dcc.Graph(id='mean_days_to_pending_graph')), # List to Sale Graph
+        html.H3('Price Cut', className="bg-primary text-light"),
         dbc.Row(dcc.Graph(id='price_cut_graph')), # Price Cut Graph
-        html.H3('Percent of Homes that Sold Below List Price'),
+        html.H3('Percent of Homes that Sold Below List Price', className="bg-primary text-light"),
         dbc.Row(dcc.Graph(id='percent_below_list_graph')), # Percent below list
-        html.H3('Rent'),
+        html.H3('Rent', className="bg-primary text-light"),
         dbc.Row(dcc.Graph(id='rent_graph')), # Rental Rates Graph
         html.H6([
             "Made possible thanks to Zillow's public data @ ",
             html.A("https://www.zillow.com/research/data/", href='https://www.zillow.com/research/data/')
-        ]), 
-        
-        
+        ]),  
     ],
     fluid=True,
+    className="dbc"
 )
 # Callback for Home Value Estimate
 @app.callback(
@@ -177,15 +177,15 @@ def update_graph(cities):
 
 # Callback for List to Sale
 @app.callback(
-    Output(component_id='list_to_sale_graph', component_property='figure'), # Output graph
+    Output(component_id='mean_days_to_pending_graph', component_property='figure'), # Output graph
     Input(component_id='city_selection', component_property='value') # Input dropdown city selections
 )
 def update_graph(cities):
-    home_selection = list_to_saleT[cities] # New dataframe with only columns from selection
+    home_selection = mean_days_to_pendingT[cities] # New dataframe with only columns from selection
     fig = px.line(home_selection, x=home_selection.index, y=home_selection.columns) # Graph with new dataframe
-    fig.update_layout(title='Mean Sale to List Ratio (All homes, weekly)',
+    fig.update_layout(title='Mean Days to Pending Sale',
                    xaxis_title='Date',
-                   yaxis_title='Sale to List',
+                   yaxis_title='Days',
                    height=600,
                    template=theme_choice)
     return fig
