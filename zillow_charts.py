@@ -63,39 +63,44 @@ num_beds = {
 }
 
 # App ----------------------
-app = Dash(__name__, external_stylesheets=[dbc.themes.MORPH])
+theme_choice = 'FLATLY'
+dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.min.css"
+app = Dash(__name__, external_stylesheets=[getattr(dbc.themes, theme_choice), dbc_css])
 app.layout = dbc.Container(
     [
         html.P(style={'margin': 10}),
-        html.H1('Housing Market Trends', style={'backgroundColor':'white', 'textAlign': 'center'}),
-        html.H2('Home Prices'),
+        html.H1('Housing Market Trends', style={'textAlign': 'center', 'font-weight': 'bold'}),
+        html.H3('Home Prices'),
         dbc.Row(dcc.Dropdown(home_pricesT.columns, 
                     id='city_selection', 
                     value= home_pricesT.columns[1:6], # Initial placeholder
                     multi=True, 
-                    placeholder="Select a city",)
+                    placeholder="Select a city",
+                    className="dbc"
+                    )
         ),
         html.Div(id='city_output_container'),
         dbc.Row(dcc.Graph(id='home_prices_graph')), # Home Value Graph
-        html.H2('Home Prices based on Home Type'),
+        html.H3('Home Prices based on Home Type'),
         dbc.Row(dcc.Dropdown(list(num_beds), 
                     id='bed_selection', 
                     #value= 'All Single Family Homes',
                     multi=False, 
-                    placeholder="Select the type of Home",)
+                    placeholder="Select the type of Home",
+                    )
         ),
         dbc.Row(dcc.Graph(id='bedroom_prices_graph')), # Home Value Graph based on number of bedrooms
-        html.H2('Inventory'),
+        html.H3('Inventory'),
         dbc.Row(dcc.Graph(id='inventory_graph')), # Inventory Graph
-        html.H2('Sale Price'),
+        html.H3('Sale Price'),
         dbc.Row(dcc.Graph(id='list_price_graph')), # Sale Price Graph
-        html.H2('Sale to List Ratio'),
+        html.H3('Sale to List Ratio'),
         dbc.Row(dcc.Graph(id='list_to_sale_graph')), # List to Sale Graph
-        html.H2('Price Cut'),
+        html.H3('Price Cut'),
         dbc.Row(dcc.Graph(id='price_cut_graph')), # Price Cut Graph
-        html.H2('Percent of Homes that Sold Below List Price'),
+        html.H3('Percent of Homes that Sold Below List Price'),
         dbc.Row(dcc.Graph(id='percent_below_list_graph')), # Percent below list
-        html.H2('Rent'),
+        html.H3('Rent'),
         dbc.Row(dcc.Graph(id='rent_graph')), # Rental Rates Graph
         html.H6([
             "Made possible thanks to Zillow's public data @ ",
@@ -113,11 +118,14 @@ app.layout = dbc.Container(
 )
 def update_graph(city_selection):
     home_selection = home_pricesT[city_selection] # New dataframe with only columns from selection
+    # Makes the Bootstrap Themed Plotly templates available
+    load_figure_template(theme_choice)
     fig = px.line(home_selection, x=home_selection.index, y=home_selection.columns) # Graph with new dataframe
     fig.update_layout(title='Zillow Home Value Index - i.e. the typical home value for each region',
                    xaxis_title='Date',
                    yaxis_title='Home Value ($)',
-                   height=600,)
+                   height=600,
+                   template=theme_choice)
     return fig
 
 # Callback for Home Value Estimate based on Bedrooms
@@ -133,7 +141,8 @@ def update_graph(bed_selection, city_selection):
     fig.update_layout(title='Zillow Home Value Index for the Type of Home Selected',
                    xaxis_title='Date',
                    yaxis_title='Home Value ($)',
-                   height=600,)
+                   height=600,
+                   template=theme_choice)
     return fig
 
 # Callback for Inventory Levels
@@ -147,7 +156,8 @@ def update_graph(cities):
     fig.update_layout(title='Home Inventory Levels',
                    xaxis_title='Date',
                    yaxis_title='Number of Homes for Sale',
-                   height=600,)
+                   height=600,
+                   template=theme_choice)
     return fig
 
 # Callback for Sale Price
@@ -161,7 +171,8 @@ def update_graph(cities):
     fig.update_layout(title='Median Sale Price (All homes, monthly)',
                    xaxis_title='Date',
                    yaxis_title='Price ($)',
-                   height=600,)
+                   height=600,
+                   template=theme_choice)
     return fig
 
 # Callback for List to Sale
@@ -175,7 +186,8 @@ def update_graph(cities):
     fig.update_layout(title='Mean Sale to List Ratio (All homes, weekly)',
                    xaxis_title='Date',
                    yaxis_title='Sale to List',
-                   height=600,)
+                   height=600,
+                   template=theme_choice)
     return fig
 
 # Callback for Price Cuts
@@ -189,7 +201,8 @@ def update_graph(cities):
     fig.update_layout(title='Share of Listings with a Price Cut (All home types)',
                    xaxis_title='Date',
                    yaxis_title='Percent of Homes with a Price Cut (%)',
-                   height=600,)
+                   height=600,
+                   template=theme_choice)
     return fig  
 
 # Percent of Homes Sold Below the List Price
@@ -203,7 +216,8 @@ def update_graph(cities):
     fig.update_layout(title='Percent of Homes Sold Below the List Price',
                    xaxis_title='Date',
                    yaxis_title='Percent of Homes Sold below List (%)',
-                   height=600,)
+                   height=600,
+                   template=theme_choice)
     return fig   
 
 # Callback for Rental Rates
@@ -217,7 +231,8 @@ def update_graph(cities):
     fig.update_layout(title='Monthly Rental Rate per Region',
                    xaxis_title='Date',
                    yaxis_title='Rental Rate ($)',
-                   height=600,)
+                   height=600,
+                   template=theme_choice)
     return fig 
 
 if __name__ == '__main__':
