@@ -1,6 +1,7 @@
 # CSV
 *.csv
 .DS_Store
+env.py 
 
 # Images
 #*jpg

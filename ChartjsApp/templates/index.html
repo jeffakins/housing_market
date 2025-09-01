@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flask + Chart.js Two Charts</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h2>Participants Over Time</h2>
+  <canvas id="chartParticipants" width="600" height="300"></canvas>
+
+  <h2>Revenue Over Time</h2>
+  <canvas id="chartRevenue" width="600" height="300"></canvas>
+
+  <script>
+    async function loadParticipantsChart() {
+      const response = await fetch("/data/participants");
+      const data = await response.json();
+
+      const ctx = document.getElementById("chartParticipants").getContext("2d");
+      new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: data.date,
+          datasets: [
+            {
+              label: "Planned",
+              data: data.planned,
+              borderColor: "blue",
+              borderDash: [5, 5],
+              fill: false
+            },
+            {
+              label: "Actual",
+              data: data.actual,
+              borderColor: "red",
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: { type: "time", time: { unit: "month" } },
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    async function loadRevenueChart() {
+      const response = await fetch("/data/revenue");
+      const data = await response.json();
+
+      const ctx = document.getElementById("chartRevenue").getContext("2d");
+      new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: data.date,
+          datasets: [
+            {
+              label: "Forecast",
+              data: data.forecast,
+              borderColor: "green",
+              borderDash: [5, 5],
+              fill: false
+            },
+            {
+              label: "Actual",
+              data: data.actual,
+              borderColor: "orange",
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: { type: "time", time: { unit: "month" } },
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    // Load both charts
+    loadParticipantsChart();
+    loadRevenueChart();
+  </script>
+</body>
+</html>
+
+
