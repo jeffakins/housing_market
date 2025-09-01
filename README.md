@@ -14,6 +14,3 @@
 - Weekly percentage of listings with a price cut
 - Weekly percentage of homes that sold below list price
 - Monthly Rent Prices
-
-Here is a sample from the webapp
-![Sample_Image](https://github.com/jeffakins/housing_market/blob/main/sample_home_price_graph.jpg?raw=true)
