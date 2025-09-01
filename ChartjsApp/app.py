@@ -1,42 +1,52 @@
 from flask import Flask, render_template, jsonify
 import pandas as pd
-
+import data_transform_functions as f
 app = Flask(__name__)
 
-# Example DataFrames
-df_participants = pd.DataFrame({
-    "date": pd.date_range(start="2023-01-01", periods=10, freq="M"),
-    "planned": [100, 120, 140, 160, 180, 200, 220, 210, 230, 250],
-    "actual": [90, 115, 135, 150, 175, 190, 210, 200, 220, 240]
-})
+# Input and transform housing list price data:
+df_price = f.home_price_transform('data/Metro_invt_fs_uc_sfr_sm_month.csv')
+print(df_price.head())
 
-df_revenue = pd.DataFrame({
-    "date": pd.date_range(start="2023-01-01", periods=10, freq="M"),
-    "forecast": [1000, 1200, 1250, 1300, 1400, 1600, 1800, 1750, 1850, 2000],
-    "actual": [950, 1100, 1230, 1280, 1350, 1500, 1700, 1680, 1800, 1950]
-})
-
+# Render HTML:
 @app.route("/")
 def index():
     return render_template("index.html")
 
-@app.route("/data/participants")
-def get_participants_data():
+# Fetch data:
+@app.route("/housedata")
+def get_data():
     data = {
-        "date": df_participants["date"].dt.strftime("%Y-%m-%d").tolist(),
-        "planned": df_participants["planned"].tolist(),
-        "actual": df_participants["actual"].tolist()
+        "dates": df_price.index.tolist(),
+        "cities": {
+            col: df_price[col].tolist()
+            for col in df_price.columns if col != "RegionName"
+        }
     }
     return jsonify(data)
 
-@app.route("/data/revenue")
-def get_revenue_data():
-    data = {
-        "date": df_revenue["date"].dt.strftime("%Y-%m-%d").tolist(),
-        "forecast": df_revenue["forecast"].tolist(),
-        "actual": df_revenue["actual"].tolist()
-    }
-    return jsonify(data)
+
+# @app.route("/data/participants")
+# def get_participants_data():
+#     data = {
+#         "date": df_participants["date"].dt.strftime("%Y-%m-%d").tolist(),
+#         "planned": df_participants["planned"].tolist(),
+#         "actual": df_participants["actual"].tolist()
+#     }
+#     return jsonify(data)
+
+# @app.route("/data/revenue")
+# def get_revenue_data():
+#     data = {
+#         "date": df_revenue["date"].dt.strftime("%Y-%m-%d").tolist(),
+#         "forecast": df_revenue["forecast"].tolist(),
+#         "actual": df_revenue["actual"].tolist()
+#     }
+#     return jsonify(data) 
+
+# # Getting data using Pandas df
+# @app.route('/data', methods=['GET'])
+# def get_data():
+#     return jsonify(df_price.to_dict(orient="records"))  # Serves the JSON data
 
 if __name__ == "__main__":
     app.run(debug=True)

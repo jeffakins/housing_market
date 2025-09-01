@@ -2,9 +2,16 @@
 
 #### Based on data pulled from [Zillow](https://www.zillow.com/research/data/)
 
-- Last data pull was from the beginning of July 2024
+- Last data pull was Sept 2025
 
 ### Charts - Time Series
+
+#### Flask/Chart.js Version
+
+- Single Family Home Monthly Inventory
+- Single Family Home Median List Price
+
+#### Dash/Plotly Version
 
 - Zillow Home Value Index
 - Zillow Home Value Index based on number of Bedrooms
