@@ -13,7 +13,7 @@ def index():
     return render_template("index.html")
 
 # Fetch data:
-@app.route("/housedata")
+@app.route("/citydata")
 def get_data():
     data = {
         "dates": df_price.index.tolist(),
@@ -24,29 +24,6 @@ def get_data():
     }
     return jsonify(data)
 
-
-# @app.route("/data/participants")
-# def get_participants_data():
-#     data = {
-#         "date": df_participants["date"].dt.strftime("%Y-%m-%d").tolist(),
-#         "planned": df_participants["planned"].tolist(),
-#         "actual": df_participants["actual"].tolist()
-#     }
-#     return jsonify(data)
-
-# @app.route("/data/revenue")
-# def get_revenue_data():
-#     data = {
-#         "date": df_revenue["date"].dt.strftime("%Y-%m-%d").tolist(),
-#         "forecast": df_revenue["forecast"].tolist(),
-#         "actual": df_revenue["actual"].tolist()
-#     }
-#     return jsonify(data) 
-
-# # Getting data using Pandas df
-# @app.route('/data', methods=['GET'])
-# def get_data():
-#     return jsonify(df_price.to_dict(orient="records"))  # Serves the JSON data
 
 if __name__ == "__main__":
     app.run(debug=True)
