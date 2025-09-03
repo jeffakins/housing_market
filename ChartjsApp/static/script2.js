@@ -6,7 +6,7 @@ async function loadData() {
 
   const citySelect = document.getElementById("citySelect");
 
-  // Populate dropdown
+  // Populate dropdown with city names
   Object.keys(dataset.cities).forEach(city => {
     const option = document.createElement("option");
     option.value = city;
@@ -14,7 +14,7 @@ async function loadData() {
     citySelect.appendChild(option);
   });
 
-  // Initial chart render
+  // Initial chart render with first city
   renderChart(dataset, Object.keys(dataset.cities)[0]);
 
   // Update chart when dropdown changes
@@ -26,7 +26,10 @@ async function loadData() {
 function renderChart(dataset, selectedCity) {
   const ctx = document.getElementById("cityChart").getContext("2d");
 
-  if (chartInstance) chartInstance.destroy();
+  // Destroy old chart before creating a new one
+  if (chartInstance) {
+    chartInstance.destroy();
+  }
 
   // Build [{x, y}, ...] points
   const points = dataset.dates.map((d, i) => ({
@@ -64,4 +67,3 @@ function renderChart(dataset, selectedCity) {
 }
 
 loadData();
-
