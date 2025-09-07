@@ -1,73 +1,69 @@
-// <block:setup:1>
-const DATA_COUNT = 12;
-const labels = [];
-for (let i = 0; i < DATA_COUNT; ++i) {
-  labels.push(i.toString());
-}
-const datapoints = [0, 20, 20, 60, 60, 120, NaN, 180, 120, 125, 105, 110, 170];
-const data = {
-  labels: labels,
-  datasets: [
-    {
-      label: 'Cubic interpolation (monotone)',
-      data: datapoints,
-      borderColor: Utils.CHART_COLORS.red,
-      fill: false,
-      cubicInterpolationMode: 'monotone',
-      tension: 0.4
-    }, {
-      label: 'Cubic interpolation',
-      data: datapoints,
-      borderColor: Utils.CHART_COLORS.blue,
-      fill: false,
-      tension: 0.4
-    }, {
-      label: 'Linear interpolation (default)',
-      data: datapoints,
-      borderColor: Utils.CHART_COLORS.green,
-      fill: false
-    }
-  ]
-};
-// </block:setup>
+// --- Chart.js Code ---
 
-// <block:config:0>
-const config = {
-  type: 'line',
-  data: data,
-  options: {
-    responsive: true,
-    plugins: {
-      title: {
-        display: true,
-        text: 'Chart.js Line Chart - Cubic interpolation mode'
-      },
-    },
-    interaction: {
-      intersect: false,
-    },
-    scales: {
-      x: {
-        display: true,
-        title: {
-          display: true
+/**
+ * Renders the chart using the data fetched from the backend.
+ * @param {object} chartData - The data object for the chart.
+ */
+function renderChart(chartData) {
+    // 1. Get the canvas element from the HTML
+    const ctx = document.getElementById('myChart').getContext('2d');
+
+    // 2. Define the configuration and options for the chart
+    const chartConfig = {
+        type: 'line',
+        data: chartData, // Use the data passed into the function
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: '#000',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    cornerRadius: 6,
+                    displayColors: true
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: '#e5e7eb' // Lighter grid lines
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false // Hide vertical grid lines
+                    }
+                }
+            }
         }
-      },
-      y: {
-        display: true,
-        title: {
-          display: true,
-          text: 'Value'
-        },
-        suggestedMin: -10,
-        suggestedMax: 200
-      }
-    }
-  },
-};
-// </block:config>
+    };
 
-module.exports = {
-  actions: [],
-  config: config,
-};
+    // 3. Create the new chart instance
+    const myChart = new Chart(ctx, chartConfig);
+}
+
+/**
+ * Fetches data from the backend and then calls the renderChart function.
+ */
+async function fetchDataAndCreateChart() {
+    try {
+        const response = await fetch('/data');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const chartData = await response.json();
+        renderChart(chartData);
+    } catch (error) {
+        console.error("Could not fetch chart data:", error);
+    }
+}
+
+// Fetch the data and create the chart when the script loads.
+fetchDataAndCreateChart();
+

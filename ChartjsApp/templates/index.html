@@ -1,27 +1,37 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Chart.js Example</title>
-  <!-- Load Chart.js from CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- Load your custom chart code -->
-  <script src="chart-setup.js" defer></script>
-  <style>
-    body {
-      max-width: 800px;
-      margin: 40px auto;
-      font-family: Arial, sans-serif;
-    }
-    canvas {
-      width: 100% !important;
-      height: 400px !important;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interpolation Line Graph</title>
+    <!-- Importing Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Importing Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom font */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
-<body>
-  <h2>Chart.js Line Chart Example</h2>
-  <div><canvas id="myChart"></canvas></div>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg w-full max-w-4xl mx-4">
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 text-center">Monthly Data Analysis</h1>
+        <p class="text-gray-600 mb-6 text-center">This chart displays a dataset with line interpolation.</p>
+        <!-- Canvas element where the chart will be rendered -->
+        <div class="relative h-96">
+            <canvas id="myChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 
+      MODIFIED: Using Flask's url_for to generate the correct path to the static file.
+      This is the standard and recommended way to link static assets in Flask.
+    -->
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+
 </body>
 </html>
 
