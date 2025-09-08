@@ -3,33 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interpolation Line Graph</title>
-    <!-- Importing Tailwind CSS for styling -->
+    <title>Interactive Home Price Dashboard</title>
+    <!-- Importing Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Importing Chart.js library -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <style>
-        /* Custom font */
         body {
             font-family: 'Inter', sans-serif;
         }
+        /* Custom scrollbar for dropdown */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="bg-gray-100">
 
-    <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-lg w-full max-w-4xl mx-4">
-        <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 text-center">Monthly Data Analysis</h1>
-        <p class="text-gray-600 mb-6 text-center">This chart displays a dataset with line interpolation.</p>
-        <!-- Canvas element where the chart will be rendered -->
-        <div class="relative h-96">
-            <canvas id="myChart"></canvas>
+    <!-- Header Section -->
+    <header class="bg-indigo-600 shadow-md">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <h1 class="text-3xl font-bold text-white">
+                Real Estate Dashboard
+            </h1>
         </div>
-    </div>
+    </header>
 
-    <!-- 
-      MODIFIED: Using Flask's url_for to generate the correct path to the static file.
-      This is the standard and recommended way to link static assets in Flask.
-    -->
+    <main class="-mt-16">
+        <div class="max-w-7xl mx-auto pb-12 px-4 sm:px-6 lg:px-8">
+            <!-- Control Panel Card -->
+            <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6 mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">City Selection</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+                    <!-- Searchable Multi-Select Component -->
+                    <div class="md:col-span-2">
+                        <label for="city-search-input" class="block text-sm font-medium text-gray-700">Search and select up to 5 cities</label>
+                        <div id="city-selector-container" class="mt-1 relative border border-gray-300 rounded-md p-2 flex flex-wrap items-center gap-2">
+                            <div id="city-tags-container" class="flex flex-wrap gap-2">
+                                <!-- Selected city tags will appear here -->
+                            </div>
+                            <input type="text" id="city-search-input" class="flex-grow outline-none text-sm" placeholder="Type to search...">
+                        </div>
+                        <div id="city-dropdown" class="absolute z-10 w-full md:w-2/3 max-h-60 overflow-y-auto bg-white border border-gray-300 rounded-md mt-1 shadow-lg hidden custom-scrollbar">
+                            <!-- Filtered city list will appear here -->
+                        </div>
+                         <p id="selection-error" class="text-red-500 text-sm mt-1 h-4"></p>
+                    </div>
+
+                    <!-- Update Chart Button -->
+                    <div class="md:self-end">
+                         <button id="update-chart-btn" class="w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-gray-400 disabled:cursor-not-allowed">
+                            Update Chart
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Card -->
+            <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
+                 <h2 class="text-xl font-semibold text-gray-800 mb-4">Monthly Average Home Price</h2>
+                <div class="relative h-96">
+                    <canvas id="myChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+
     <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 
 </body>
