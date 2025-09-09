@@ -64,7 +64,7 @@ async function updateChart() {
     updateBtn.disabled = true;
 
     try {
-        const response = await fetch(`/api/data?cities=${selectedCities.join(',')}`);
+        const response = await fetch(`/api/citydata?cities=${selectedCities.join(',')}`);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const chartData = await response.json();
         renderChart(chartData);

@@ -11,7 +11,7 @@ def home_price_transform(house_csv):
     house = house.drop(columns=['RegionID', 'SizeRank', 'RegionType', 'StateName'])
     house = house.set_index('RegionName').sort_index()
     house = house.T
-    house.index = pd.to_datetime(house.index)
+    house.index = pd.to_datetime(house.index, format='%Y-%m-%d')
     return house
 
 def home_rent_transform(house):
@@ -20,5 +20,5 @@ def home_rent_transform(house):
     house = house.drop(columns=['RegionID', 'SizeRank'])
     house = house.set_index('RegionName')
     house = house.T
-    house.index = pd.to_datetime(house.index)
+    house.index = pd.to_datetime(house.index, format='%Y-%m-%d')
     return house

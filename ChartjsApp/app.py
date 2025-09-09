@@ -28,7 +28,7 @@ def get_cities():
     """Provides the list of available cities."""
     return jsonify(list(df_price.columns))
 
-@app.route('/api/data')
+@app.route('/api/citydata')
 def get_chart_data():
     """
     Provides chart data as JSON based on selected cities from query parameters.
