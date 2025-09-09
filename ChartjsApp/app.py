@@ -9,9 +9,6 @@ app = Flask(__name__)
 df_price = f.home_price_transform('data/Metro_mlp_uc_sfr_sm_month.csv') # Mean list price SFH
 df_inv = f.home_price_transform('data/Metro_invt_fs_uc_sfr_sm_month.csv') # Inventory
 
-print(df_price.head())
-print(df_price.index[0:5])
-
 # --- Chart Data ---
 # This data is now managed by the backend.# --- Color Palette for Chart Lines ---
 # --- Color Palette for Chart Lines ---
@@ -42,10 +39,15 @@ def get_chart_data():
     if not selected_cities_str:
         return jsonify({"error": "No cities selected"}), 400
         
-    selected_cities = selected_cities_str #.split(',')
-    print(selected_cities)
+    # 1. Split by all commas
+    split_by_all_commas = selected_cities_str.split(',')
+    # 2. Group elements in pairs
+    paired_elements = zip(split_by_all_commas[::2], split_by_all_commas[1::2])
+    # 3. Join the pairs with a comma in between
+    selected_cities = [f"{first},{second}" for first, second in paired_elements]
+
     # Filter the DataFrame to include only the selected cities
-    filtered_df = df_price[['San Diego, CA', 'Seattle, WA']]
+    filtered_df = df_price[selected_cities]
     
     chart_data = {
         'labels': list(filtered_df.index),
@@ -65,7 +67,7 @@ def get_chart_data():
             'pointHoverRadius': 7
         }
         chart_data['datasets'].append(dataset)
-        
+       
     return jsonify(chart_data)
 
 if __name__ == '__main__':
