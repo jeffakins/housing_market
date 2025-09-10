@@ -45,7 +45,28 @@ function renderChart(chartData) {
                         }
                     }
                 },
-                x: { grid: { display: false } }
+                x: { 
+                    grid: { display: false },
+                    ticks: {
+                        // --- NEW: Custom X-Axis Label Formatting ---
+                        callback: function(value) {
+                            // 'value' is the index of the label in the data.labels array.
+                            // this.getLabelForValue(value) retrieves the actual label (e.g., "2023-01-31").
+                            const label = this.getLabelForValue(value);
+                            
+                            // Create a date object, ensuring it's treated as local time to avoid timezone shifts.
+                            const date = new Date(label);
+
+                            // If the month is January (month index 0), show month and year.
+                            if (date.getMonth() === 0) {
+                                return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+                            }
+                            
+                            // Otherwise, just show the three-letter month name.
+                            return date.toLocaleDateString('en-US', { month: 'short' });
+                        }
+                    }
+                }
             }
         }
     });
@@ -169,8 +190,8 @@ async function initialize() {
         
         // Pre-select the first two cities for the initial view
         if (allCities.length >= 2) {
-            selectCity(allCities[0]);
-            selectCity(allCities[1]);
+            selectCity('Los Angeles, CA'); //allCities[0]
+            selectCity('New York, NY'); //allCities[1]
         }
         
         updateChart();

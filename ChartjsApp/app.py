@@ -34,11 +34,13 @@ def get_chart_data():
     Provides chart data as JSON based on selected cities from query parameters.
     Example request: /api/data?cities=New York,Los Angeles
     """
+    # Get the cities that the user selects:
     selected_cities_str = request.args.get('cities')
     
     if not selected_cities_str:
         return jsonify({"error": "No cities selected"}), 400
         
+    # Format the city strings to match the dataset format    
     # 1. Split by all commas
     split_by_all_commas = selected_cities_str.split(',')
     # 2. Group elements in pairs
