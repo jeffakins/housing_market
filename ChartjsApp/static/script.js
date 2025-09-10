@@ -142,10 +142,10 @@ function selectCity(city) {
  */
 function addCityTag(city) {
     const tag = document.createElement('div');
-    tag.className = 'bg-indigo-100 text-indigo-700 text-sm font-medium px-2 py-1 rounded-full flex items-center gap-2';
+    tag.className = 'bg-blue-100 text-blue-700 text-sm font-medium px-2 py-1 rounded-full flex items-center gap-2';
     tag.innerHTML = `
         <span>${city}</span>
-        <button class="text-indigo-500 hover:text-indigo-700 focus:outline-none">&times;</button>
+        <button class="text-blue-500 hover:text-blue-700 focus:outline-none">&times;</button>
     `;
     tag.querySelector('button').addEventListener('click', () => removeCity(city, tag));
     tagsContainer.appendChild(tag);
