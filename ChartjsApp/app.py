@@ -6,8 +6,8 @@ import data_transform_functions as f
 app = Flask(__name__)
 
 # Input and transform housing list price data:
-df_price = f.home_price_transform('data/Metro_mlp_uc_sfr_sm_month.csv') # Mean list price SFH
-df_inv = f.home_price_transform('data/Metro_invt_fs_uc_sfr_sm_month.csv') # Inventory
+df_price = f.home_price_inventory_transform('data/Metro_mlp_uc_sfr_sm_month.csv') # Mean list price SFH
+df_inv = f.home_price_inventory_transform('data/Metro_invt_fs_uc_sfr_sm_month.csv') # Inventory
 
 # --- Chart Data ---
 # This data is now managed by the backend.# --- Color Palette for Chart Lines ---

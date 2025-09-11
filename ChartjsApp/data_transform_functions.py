@@ -4,7 +4,7 @@
 import pandas as pd
 
 # Functions
-def home_price_transform(house_csv):
+def home_price_inventory_transform(house_csv):
     '''Transforms the the Zillow Home Value Index dataframe into a format
     that can be used for a timeseries line graph in json format for chartjs'''
     house = pd.read_csv(house_csv)
@@ -12,6 +12,8 @@ def home_price_transform(house_csv):
     house = house.set_index('RegionName').sort_index()
     house = house.T
     house.index = pd.to_datetime(house.index, format='%Y-%m-%d')
+    house = house.interpolate(method='quadratic')
+    house = house.fillna(0)
     return house
 
 def home_rent_transform(house):
