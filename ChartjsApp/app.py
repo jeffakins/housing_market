@@ -14,8 +14,13 @@ df_inv = f.home_price_inventory_transform('data/Metro_invt_fs_uc_sfr_sm_month.cs
 # --- Color Palette for Chart Lines ---
 # A list of colors to cycle through for different cities.
 COLOR_PALETTE = [
-    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+    "#FF6385", '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
     '#FF9F40', '#C9CBCF', '#7CFFB2' 
+]
+# Transparent versions colors to cycle through for different cities.
+COLOR_PALETTE2 = [
+    "#FF638576", "#36A3EB7A", "#FFCF567D", "#4BC0C07F", "#9966FF7E",
+    "#FFA04078", "#C9CBCF7D", "#7CFFB379" 
 ]
 
 @app.route('/')
@@ -63,10 +68,11 @@ def get_chart_data():
             'data': list(filtered_df[city]),
             'fill': False,
             'borderColor': COLOR_PALETTE[i % len(COLOR_PALETTE)], # Cycle through colors
+            'backgroundColor': COLOR_PALETTE2[i % len(COLOR_PALETTE2)], # Cycle through transparent colors
             'tension': 0.1,
             'borderWidth': 3,
-            'pointRadius': 4,
-            'pointHoverRadius': 7
+            'pointRadius': 3,
+            'pointHoverRadius': 8
         }
         chart_data['datasets'].append(dataset)
        
