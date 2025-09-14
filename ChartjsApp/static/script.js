@@ -32,7 +32,7 @@ function renderChart(chartData) {
                 legend: { position: 'top' },
                 tooltip: {
                     enabled: true,
-                    mode: 'index',
+                    mode: 'nearest',
                     intersect: false,
                 },
             },
