@@ -10,9 +10,9 @@ df_price = f.home_price_inventory_transform('data/Metro_mlp_uc_sfr_sm_month.csv'
 df_inv = f.home_price_inventory_transform('data/Metro_invt_fs_uc_sfr_sm_month.csv') # Inventory
 
 # --- Chart Data ---
-# This data is now managed by the backend
+# This data is now managed by the backend.# --- Color Palette for Chart Lines ---
 # --- Color Palette for Chart Lines ---
-# A list of colors to cycle through for different cities
+# A list of colors to cycle through for different cities.
 COLOR_PALETTE = [
     "#FF6385", '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
     '#FF9F40', '#C9CBCF', '#7CFFB2' 
