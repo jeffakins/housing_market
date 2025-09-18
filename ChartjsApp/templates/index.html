@@ -45,15 +45,14 @@
             <!-- Control Panel Card -->
             <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6 mb-8">
                 <h2 class="text-xl font-semibold text-gray-800 mb-4">City Selection</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+                <div class="flex flex-col md:flex-row md:items-end gap-6">
                     <!-- Searchable Multi-Select Component -->
-                    <div class="md:col-span-2">
-                        <label for="city-search-input" class="block text-sm font-medium text-gray-700">Search and select up to 5 cities</label>
+                    <div class="flex-grow">
                         <div id="city-selector-container" class="mt-1 relative border border-gray-300 rounded-md p-2 flex flex-wrap items-center gap-2">
                             <div id="city-tags-container" class="flex flex-wrap gap-2">
                                 <!-- Selected city tags will appear here -->
                             </div>
-                            <input type="text" id="city-search-input" class="flex-grow outline-none text-sm" placeholder="Type to search...">
+                            <input type="text" id="city-search-input" class="flex-grow outline-none text-sm" placeholder="Search and select up to 5 cities...">
                         </div>
                         <div id="city-dropdown" class="absolute z-10 w-full md:w-2/3 max-h-60 overflow-y-auto bg-white border border-gray-300 rounded-md mt-1 shadow-lg hidden custom-scrollbar">
                             <!-- Filtered city list will appear here -->
@@ -62,7 +61,7 @@
                     </div>
 
                     <!-- Update Chart Button -->
-                    <div class="md:self-end">
+                    <div>
                          <button id="update-chart-btn" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed">
                             Update Chart
                         </button>
