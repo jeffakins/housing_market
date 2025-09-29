@@ -17,6 +17,7 @@ COLOR_PALETTE = [
     "#FF6385", '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
     '#FF9F40', '#C9CBCF', '#7CFFB2' 
 ]
+
 # Transparent versions colors to cycle through for different cities.
 COLOR_PALETTE2 = [
     "#FF638576", "#36A3EB7A", "#FFCF567D", "#4BC0C07F", "#9966FF7E",
@@ -68,7 +69,7 @@ def get_chart_data():
             'data': list(filtered_df[city]),
             'fill': False,
             'borderColor': COLOR_PALETTE[i % len(COLOR_PALETTE)], # Cycle through colors
-            'backgroundColor': COLOR_PALETTE2[i % len(COLOR_PALETTE2)], # Cycle through transparent colors
+            #'backgroundColor': COLOR_PALETTE2[i % len(COLOR_PALETTE2)], # Cycle through transparent colors
             'tension': 0.1,
             'borderWidth': 3,
             'pointRadius': 3,
