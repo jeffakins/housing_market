@@ -126,7 +126,7 @@ function renderDropdown() {
  * @param {string} city - The city name to select.
  */
 function selectCity(city) {
-    if (selectedCities.length < 5) {
+    if (selectedCities.length < 9) {
         selectedCities.push(city);
         addCityTag(city);
         searchInput.value = '';
@@ -168,8 +168,8 @@ function removeCity(city, tagElement) {
  */
 function validateSelection() {
     const count = selectedCities.length;
-    if (count > 5) {
-        selectionError.textContent = 'Maximum of 5 cities allowed.';
+    if (count > 9) {
+        selectionError.textContent = 'Maximum of 8 cities allowed.';
         updateBtn.disabled = true;
     } else if (count === 0) {
         selectionError.textContent = 'Please select at least one city.';
@@ -190,8 +190,8 @@ async function initialize() {
         
         // Pre-select the first two cities for the initial view
         if (allCities.length >= 2) {
-            selectCity('Los Angeles, CA'); //allCities[0]
-            selectCity('New York, NY'); //allCities[1]
+            selectCity('Los Angeles, CA'); 
+            selectCity('New York, NY'); 
         }
         
         updateChart();

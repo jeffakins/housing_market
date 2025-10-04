@@ -14,14 +14,14 @@ df_inv = f.home_price_inventory_transform('data/Metro_invt_fs_uc_sfr_sm_month.cs
 # --- Color Palette for Chart Lines ---
 # A list of colors to cycle through for different cities
 COLOR_PALETTE = [
-    "#FF6385", '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
-    '#FF9F40', '#C9CBCF', '#7CFFB2' 
+    '#FF6385', '#36A2EB', '#FFCE56', '#4BC0C0', 
+    '#9966FF', '#FF9F40', '#C9CBCF', '#7CFFB2' 
 ]
 
 # Transparent versions colors to cycle through for different cities.
 COLOR_PALETTE2 = [
-    "#FF638576", "#36A3EB7A", "#FFCF567D", "#4BC0C07F", "#9966FF7E",
-    "#FFA04078", "#C9CBCF7D", "#7CFFB379" 
+    "#FF638576", "#36A3EB7A", "#FFCF567D", "#4BC0C07F", 
+    "#9966FF7E","#FFA04078", "#C9CBCF7D", "#7CFFB379" 
 ]
 
 @app.route('/')
