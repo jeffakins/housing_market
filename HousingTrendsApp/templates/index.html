@@ -71,12 +71,12 @@
                 </div>
             </div>
 
-            <!-- Chart Card -->
-            <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6 relative">
+            <!-- Price Chart Card -->
+            <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6 mb-8">
                  <div class="flex justify-between items-center mb-4">
                      <h2 class="text-xl font-semibold text-gray-800">Monthly Average Single Family Home Price</h2>
                      <!-- Time Range Buttons -->
-                     <div id="time-range-container" class="flex items-center border border-gray-300 rounded-lg p-0.5">
+                     <div id="price-time-range-container" class="flex items-center border border-gray-300 rounded-lg p-0.5">
                          <button data-range="max" class="time-range-btn active text-sm px-3 py-1 rounded-md">All</button>
                          <button data-range="5y" class="time-range-btn text-sm px-3 py-1 rounded-md">5Y</button>
                          <button data-range="2y" class="time-range-btn text-sm px-3 py-1 rounded-md">2Y</button>
@@ -84,7 +84,24 @@
                      </div>
                  </div>
                 <div class="relative h-96">
-                    <canvas id="myChart"></canvas>
+                    <canvas id="priceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Inventory Chart Card -->
+            <div class="bg-white rounded-lg shadow px-5 py-6 sm:px-6">
+                 <div class="flex justify-between items-center mb-4">
+                     <h2 class="text-xl font-semibold text-gray-800">Monthly Average Single Family Home Inventory</h2>
+                     <!-- Time Range Buttons -->
+                     <div id="inventory-time-range-container" class="flex items-center border border-gray-300 rounded-lg p-0.5">
+                         <button data-range="max" class="time-range-btn active text-sm px-3 py-1 rounded-md">All</button>
+                         <button data-range="5y" class="time-range-btn text-sm px-3 py-1 rounded-md">5Y</button>
+                         <button data-range="2y" class="time-range-btn text-sm px-3 py-1 rounded-md">2Y</button>
+                         <button data-range="1y" class="time-range-btn text-sm px-3 py-1 rounded-md">1Y</button>
+                     </div>
+                 </div>
+                <div class="relative h-96">
+                    <canvas id="inventoryChart"></canvas>
                 </div>
             </div>
         </div>

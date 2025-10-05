@@ -1,134 +1,179 @@
 // --- Interactive Dashboard Chart Code ---
 
-// Global variables
-let myChart = null;
+// --- Global Variables ---
+let priceChart = null;
+let inventoryChart = null;
 let allCities = [];
 let selectedCities = [];
 const MAX_CITIES = 8;
 let highlightedIndex = -1;
 let chartUpdateTimeout;
-let fullChartData = null; // To store the complete data from API
-let activeTimeRange = 'max'; // Default time range
 
-// DOM element references
+// Data stores
+let fullPriceData = null;
+let fullInventoryData = null;
+
+// State for time ranges
+let activePriceTimeRange = 'max';
+let activeInventoryTimeRange = 'max';
+
+// --- DOM Element References ---
 const searchInput = document.getElementById('city-search-input');
 const cityDropdown = document.getElementById('city-dropdown');
 const tagsContainer = document.getElementById('city-tags-container');
 const selectorContainer = document.getElementById('city-selector-container');
 const selectionError = document.getElementById('selection-error');
-const timeRangeContainer = document.getElementById('time-range-container');
+const priceTimeRangeContainer = document.getElementById('price-time-range-container');
+const inventoryTimeRangeContainer = document.getElementById('inventory-time-range-container');
+
+
+// --- Charting Functions ---
 
 /**
- * Applies the active time range filter to the full dataset.
+ * Applies a time filter to a given dataset.
+ * @param {object} fullData - The complete, unfiltered dataset.
+ * @param {string} timeRange - The active time range ('max', '5y', '2y', '1y').
+ * @returns {object} The filtered data object.
  */
-function applyTimeFilter() {
-    if (!fullChartData) return;
+function applyTimeFilter(fullData, timeRange) {
+    if (!fullData) return null;
 
-    const filteredData = JSON.parse(JSON.stringify(fullChartData)); // Deep copy
+    const filteredData = JSON.parse(JSON.stringify(fullData)); // Deep copy
     const { labels } = filteredData;
     
     let startIndex = 0;
-    if (activeTimeRange !== 'max') {
-        const startDate = new Date(); // Create a new date object for calculation
+    if (timeRange !== 'max') {
+        const startDate = new Date();
         let yearsToSubtract = 0;
-        switch(activeTimeRange) {
+        switch(timeRange) {
             case '5y': yearsToSubtract = 5; break;
             case '2y': yearsToSubtract = 2; break;
             case '1y': yearsToSubtract = 1; break;
         }
-        // This safely modifies the new startDate object
         startDate.setFullYear(startDate.getFullYear() - yearsToSubtract);
         
         startIndex = labels.findIndex(label => new Date(label) >= startDate);
-        if(startIndex === -1) startIndex = 0; // If no data in range, show from beginning
+        if(startIndex === -1) startIndex = 0;
     }
 
-    // Slice the data based on the start index
     filteredData.labels = labels.slice(startIndex);
     filteredData.datasets.forEach(dataset => {
         dataset.data = dataset.data.slice(startIndex);
     });
     
-    renderChart(filteredData);
+    return filteredData;
 }
 
-
 /**
- * Renders or updates the chart with new data.
- * @param {object} chartData - Data object for the chart from the backend.
+ * Creates a generic Chart.js configuration object.
+ * @param {boolean} isCurrency - Whether to format the y-axis and tooltips as currency.
+ * @returns {object} A Chart.js options object.
  */
-function renderChart(chartData) {
-    const ctx = document.getElementById('myChart').getContext('2d');
-    if (myChart) {
-        myChart.destroy();
-    }
-    myChart = new Chart(ctx, {
-        type: 'line',
-        data: chartData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'top' },
-                tooltip: {
-                    enabled: true,
-                    mode: 'nearest',
-                    intersect: true,
-                    callbacks: {
-                        title: function(tooltipItems) {
-                            const date = new Date(tooltipItems[0].label);
-                            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-                        },
-                        label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) { label += ': '; }
-                            if (context.parsed.y !== null) {
+function createChartOptions(isCurrency = false) {
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'top' },
+            tooltip: {
+                enabled: true,
+                mode: 'nearest',
+                intersect: false,
+                callbacks: {
+                    title: (tooltipItems) => {
+                        const date = new Date(tooltipItems[0].label);
+                        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+                    },
+                    label: (context) => {
+                        let label = context.dataset.label || '';
+                        if (label) { label += ': '; }
+                        if (context.parsed.y !== null) {
+                            if (isCurrency) {
                                 label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(context.parsed.y);
+                            } else {
+                                label += new Intl.NumberFormat('en-US').format(context.parsed.y);
                             }
-                            return label;
                         }
+                        return label;
                     }
-                },
+                }
             },
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    ticks: { callback: value => '$' + new Intl.NumberFormat('en-US').format(value) }
-                },
-                x: { 
-                    grid: { display: false },
-                    ticks: {
-                        callback: function(value) {
-                            const label = this.getLabelForValue(value);
-                            const date = new Date(label);
-                            return date.getMonth() === 0 
-                                ? date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
-                                : date.toLocaleDateString('en-US', { month: 'short' });
-                        }
+        },
+        scales: {
+            y: {
+                beginAtZero: false,
+                ticks: { 
+                    callback: (value) => isCurrency 
+                        ? '$' + new Intl.NumberFormat('en-US').format(value) 
+                        : new Intl.NumberFormat('en-US').format(value) 
+                }
+            },
+            x: { 
+                grid: { display: false },
+                ticks: {
+                    callback: function(value) {
+                        const label = this.getLabelForValue(value);
+                        const date = new Date(label);
+                        return date.getMonth() === 0 
+                            ? date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
+                            : date.toLocaleDateString('en-US', { month: 'short' });
                     }
                 }
             }
         }
-    });
+    };
 }
 
 /**
- * Fetches data for the selected cities, stores it, and triggers filtering/rendering.
+ * Renders or updates a specific chart.
+ * @param {Chart} chartInstance - The chart instance to update (e.g., priceChart).
+ * @param {string} canvasId - The ID of the canvas element.
+ * @param {object} chartData - The data to render.
+ * @param {object} options - The chart options.
+ * @returns {Chart} The new or updated Chart instance.
  */
-function updateChart() {
+function renderChart(chartInstance, canvasId, chartData, options) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    if (chartInstance) {
+        chartInstance.destroy();
+    }
+    return new Chart(ctx, { type: 'line', data: chartData, options: options });
+}
+
+/**
+ * Fetches data for all charts and triggers rendering.
+ */
+function updateAllCharts() {
     clearTimeout(chartUpdateTimeout);
     chartUpdateTimeout = setTimeout(async () => {
         if (selectedCities.length === 0) {
-            if (myChart) { myChart.destroy(); myChart = null; }
-            fullChartData = null;
+            if (priceChart) { priceChart.destroy(); priceChart = null; }
+            if (inventoryChart) { inventoryChart.destroy(); inventoryChart = null; }
+            fullPriceData = null;
+            fullInventoryData = null;
             return;
         }
         
         try {
-            const response = await fetch(`/api/citydata?cities=${selectedCities.join(',')}`);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            fullChartData = await response.json(); // Store full data
-            applyTimeFilter(); // Apply filter and render
+            // Fetch both datasets in parallel
+            const [priceResponse, inventoryResponse] = await Promise.all([
+                fetch(`/api/pricedata?cities=${selectedCities.join(',')}`),
+                fetch(`/api/inventorydata?cities=${selectedCities.join(',')}`) // <-- FIX IS HERE
+            ]);
+
+            if (!priceResponse.ok) throw new Error('Price data fetch failed');
+            if (!inventoryResponse.ok) throw new Error('Inventory data fetch failed');
+
+            fullPriceData = await priceResponse.json();
+            fullInventoryData = await inventoryResponse.json();
+
+            // Filter and render both charts
+            const filteredPriceData = applyTimeFilter(fullPriceData, activePriceTimeRange);
+            priceChart = renderChart(priceChart, 'priceChart', filteredPriceData, createChartOptions(true));
+
+            const filteredInventoryData = applyTimeFilter(fullInventoryData, activeInventoryTimeRange);
+            inventoryChart = renderChart(inventoryChart, 'inventoryChart', filteredInventoryData, createChartOptions(false));
+
         } catch (error) {
             console.error("Could not fetch chart data:", error);
             selectionError.textContent = "Failed to load chart data.";
@@ -138,9 +183,9 @@ function updateChart() {
     }, 300);
 }
 
-/**
- * Populates the dropdown with filtered, unselected cities.
- */
+
+// --- City Selection UI Functions ---
+
 function renderDropdown() {
     cityDropdown.innerHTML = '';
     highlightedIndex = -1;
@@ -164,10 +209,6 @@ function renderDropdown() {
     }
 }
 
-/**
- * Handles the selection of a city from the dropdown.
- * @param {string} city - The city name to select.
- */
 function selectCity(city) {
     if (selectedCities.length < MAX_CITIES) {
         selectedCities.push(city);
@@ -175,15 +216,11 @@ function selectCity(city) {
         searchInput.value = '';
         cityDropdown.classList.add('hidden');
         searchInput.focus();
-        updateChart();
+        updateAllCharts();
     }
     validateSelection();
 }
 
-/**
- * Creates and displays a tag for a selected city.
- * @param {string} city - The city name for the tag.
- */
 function addCityTag(city) {
     const tag = document.createElement('div');
     tag.className = 'bg-blue-100 text-[#246D9E] text-sm font-medium px-2 py-1 rounded-full flex items-center gap-2';
@@ -195,36 +232,19 @@ function addCityTag(city) {
     tagsContainer.appendChild(tag);
 }
 
-/**
- * Removes a city from the selection and its corresponding tag.
- * @param {string} city - The city name to remove.
- * @param {HTMLElement} tagElement - The tag element to remove.
- */
 function removeCity(city, tagElement) {
     selectedCities = selectedCities.filter(c => c !== city);
     tagsContainer.removeChild(tagElement);
-    updateChart();
+    updateAllCharts();
     validateSelection();
 }
 
-/**
- * Validates the number of selected cities and updates UI state.
- */
 function validateSelection() {
     const count = selectedCities.length;
-    if (count >= MAX_CITIES) {
-        selectionError.textContent = `Maximum of ${MAX_CITIES} cities allowed.`;
-        searchInput.disabled = true;
-    } else {
-        selectionError.textContent = '';
-        searchInput.disabled = false;
-    }
+    searchInput.disabled = count >= MAX_CITIES;
+    selectionError.textContent = count >= MAX_CITIES ? `Maximum of ${MAX_CITIES} cities allowed.` : '';
 }
 
-/**
- * Manages keyboard navigation for the city dropdown.
- * @param {KeyboardEvent} e - The keyboard event.
- */
 function handleKeyboardNavigation(e) {
     const items = cityDropdown.querySelectorAll('div');
     if (items.length === 0) return;
@@ -233,59 +253,44 @@ function handleKeyboardNavigation(e) {
         case 'ArrowDown':
             e.preventDefault();
             highlightedIndex = (highlightedIndex + 1) % items.length;
-            updateDropdownHighlight(items);
             break;
         case 'ArrowUp':
             e.preventDefault();
             highlightedIndex = (highlightedIndex - 1 + items.length) % items.length;
-            updateDropdownHighlight(items);
             break;
         case 'Enter':
             e.preventDefault();
-            if (highlightedIndex > -1) {
-                selectCity(items[highlightedIndex].textContent);
-            }
-            break;
+            if (highlightedIndex > -1) selectCity(items[highlightedIndex].textContent);
+            return; 
         case 'Escape':
             cityDropdown.classList.add('hidden');
-            break;
+            return;
+        default:
+            return;
     }
+    updateDropdownHighlight(items);
 }
 
-/**
- * Updates the visual highlight on dropdown items.
- * @param {NodeListOf<HTMLDivElement>} items - The list of dropdown items.
- */
 function updateDropdownHighlight(items) {
     items.forEach((item, index) => {
-        if (index === highlightedIndex) {
-            item.classList.add('highlighted');
-            item.scrollIntoView({ block: 'nearest' });
-        } else {
-            item.classList.remove('highlighted');
-        }
+        item.classList.toggle('highlighted', index === highlightedIndex);
+        if (index === highlightedIndex) item.scrollIntoView({ block: 'nearest' });
     });
 }
 
-/**
- * Fetches the initial list of all cities to populate the selector.
- */
+
+// --- Initialization ---
+
 async function initialize() {
     try {
         const response = await fetch('/api/cities');
         if (!response.ok) throw new Error('Failed to fetch city list.');
         allCities = await response.json();
         
-        if (allCities.includes('Los Angeles, CA')) {
-            selectCity('Los Angeles, CA'); 
-        }
-        if (allCities.includes('New York, NY')) {
-            selectCity('New York, NY');
-        }
+        if (allCities.includes('Los Angeles, CA')) selectCity('Los Angeles, CA'); 
+        if (allCities.includes('New York, NY')) selectCity('New York, NY');
 
-        if (selectedCities.length === 0) {
-            updateChart();
-        }
+        if (selectedCities.length === 0) updateAllCharts();
 
     } catch (error) {
         console.error("Initialization failed:", error);
@@ -293,7 +298,9 @@ async function initialize() {
     }
 }
 
+
 // --- Event Listeners ---
+
 document.addEventListener('DOMContentLoaded', initialize);
 searchInput.addEventListener('input', renderDropdown);
 searchInput.addEventListener('keydown', handleKeyboardNavigation);
@@ -304,16 +311,28 @@ document.addEventListener('click', (e) => {
     }
 });
 
-timeRangeContainer.addEventListener('click', (e) => {
+priceTimeRangeContainer.addEventListener('click', (e) => {
     if (e.target.tagName === 'BUTTON') {
         const newRange = e.target.dataset.range;
-        if (newRange !== activeTimeRange) {
-            activeTimeRange = newRange;
-            // Update active button style
-            timeRangeContainer.querySelector('.active').classList.remove('active');
+        if (newRange !== activePriceTimeRange) {
+            activePriceTimeRange = newRange;
+            priceTimeRangeContainer.querySelector('.active').classList.remove('active');
             e.target.classList.add('active');
-            // Re-filter and render the chart
-            applyTimeFilter();
+            const filteredData = applyTimeFilter(fullPriceData, activePriceTimeRange);
+            priceChart = renderChart(priceChart, 'priceChart', filteredData, createChartOptions(true));
+        }
+    }
+});
+
+inventoryTimeRangeContainer.addEventListener('click', (e) => {
+    if (e.target.tagName === 'BUTTON') {
+        const newRange = e.target.dataset.range;
+        if (newRange !== activeInventoryTimeRange) {
+            activeInventoryTimeRange = newRange;
+            inventoryTimeRangeContainer.querySelector('.active').classList.remove('active');
+            e.target.classList.add('active');
+            const filteredData = applyTimeFilter(fullInventoryData, activeInventoryTimeRange);
+            inventoryChart = renderChart(inventoryChart, 'inventoryChart', filteredData, createChartOptions(false));
         }
     }
 });
