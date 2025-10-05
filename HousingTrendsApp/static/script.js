@@ -278,9 +278,15 @@ async function initialize() {
         
         if (allCities.includes('Los Angeles, CA')) {
             selectCity('Los Angeles, CA'); 
-        } else {
+        }
+        if (allCities.includes('New York, NY')) {
+            selectCity('New York, NY');
+        }
+
+        if (selectedCities.length === 0) {
             updateChart();
         }
+
     } catch (error) {
         console.error("Initialization failed:", error);
         selectionError.textContent = "Could not load city data.";
