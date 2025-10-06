@@ -158,7 +158,7 @@ function updateAllCharts() {
             // Fetch both datasets in parallel
             const [priceResponse, inventoryResponse] = await Promise.all([
                 fetch(`/api/pricedata?cities=${selectedCities.join(',')}`),
-                fetch(`/api/inventorydata?cities=${selectedCities.join(',')}`) // <-- FIX IS HERE
+                fetch(`/api/inventorydata?cities=${selectedCities.join(',')}`)
             ]);
 
             if (!priceResponse.ok) throw new Error('Price data fetch failed');
@@ -279,6 +279,40 @@ function updateDropdownHighlight(items) {
 }
 
 
+// --- Sidebar Navigation ---
+function setupSidebarNavigation() {
+    const sidebarNav = document.getElementById('sidebar-nav');
+    if (!sidebarNav) return;
+
+    const sections = [
+        document.getElementById('price-chart-card'),
+        document.getElementById('inventory-chart-card')
+    ];
+    const navLinks = sidebarNav.querySelectorAll('a');
+
+    const observerOptions = {
+        root: null,
+        rootMargin: '0px 0px -50% 0px', // Trigger when section is in top half of screen
+        threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const targetId = entry.target.getAttribute('id');
+            const link = sidebarNav.querySelector(`a[href="#${targetId}"]`);
+            if (entry.isIntersecting) {
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            }
+        });
+    }, observerOptions);
+
+    sections.forEach(section => {
+        if (section) observer.observe(section);
+    });
+}
+
+
 // --- Initialization ---
 
 async function initialize() {
@@ -301,7 +335,11 @@ async function initialize() {
 
 // --- Event Listeners ---
 
-document.addEventListener('DOMContentLoaded', initialize);
+document.addEventListener('DOMContentLoaded', () => {
+    initialize();
+    setupSidebarNavigation();
+});
+
 searchInput.addEventListener('input', renderDropdown);
 searchInput.addEventListener('keydown', handleKeyboardNavigation);
 

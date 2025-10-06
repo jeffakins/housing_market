@@ -54,10 +54,10 @@ def process_chart_data_request(df):
             'fill': False,
             'borderColor': COLOR_PALETTE[i % len(COLOR_PALETTE)],
             'backgroundColor': COLOR_PALETTE2[i % len(COLOR_PALETTE2)],
-            'tension': 0.1,
-            'borderWidth': 2,
-            'pointRadius': 0,
-            'pointHoverRadius': 5
+            'tension': 0.3,
+            'borderWidth': 3,
+            'pointRadius': 3,
+            'pointHoverRadius': 8
         }
         chart_data['datasets'].append(dataset)
        
